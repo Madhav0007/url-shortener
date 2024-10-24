@@ -54,7 +54,8 @@ A simple and user-friendly URL shortener application that allows users to shorte
 
 3.**Setup Frontend:**:
     Navigate to the frontend directory:
+    ```bash
     cd ../frontend
 
-3.**Access the application::**:
+4.**Access the application::**:
     Open your browser and go to http://localhost:3000 to access the URL shortener application.
