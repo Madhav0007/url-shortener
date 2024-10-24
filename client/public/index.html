@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <div class="main-section">
+        <h1 class="title">Shorten Your URL</h1>
+        <div class="form-section">
+            <input type="text" id="urlInput" placeholder="Enter a URL to shorten" size="40">
+            <input type="datetime-local" id="expirationInput" placeholder="Expiration Date">
+            <button id="shortenBtn">Shorten URL</button>
+        </div>
+
+        <div class="short-url" id="shortUrlContainer"></div>
+        <canvas id="qrCodeCanvas" class="qr-code"></canvas>
+
+        <div class="login-section">
+            <h2>Login to Access Tracking</h2>
+            <input type="email" id="emailInput" placeholder="Email">
+            <input type="password" id="passwordInput" placeholder="Password">
+            <button id="loginBtn">Login</button>
+        </div>
+
+        <div class="tracking-section">
+            <h2>Track Your URL</h2>
+            <input type="text" id="trackingCodeInput" placeholder="Enter Short Code">
+            <button id="trackBtn">Track URL</button>
+            <div id="trackingData"></div>
+        </div>
+
+        <div id="trackingModal" class="modal" style="display: none;">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <h2>URL Tracking Data</h2>
+              <div id="trackingDataContent">Tracking data will be shown here...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('shortenBtn').addEventListener('click', async function() {
+            const url = document.getElementById('urlInput').value;
+            const expirationDate = document.getElementById('expirationInput').value;
+
+            if (!url) {
+                alert("Please enter a valid URL!");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/shorten', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ longUrl: url, expirationDate })
+                });
+
+                const data = await response.json();
+                document.getElementById('shortUrlContainer').innerHTML = 
+                    `Shortened URL: <a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>`;
+
+                const qr = new QRious({
+                    element: document.getElementById('qrCodeCanvas'),
+                    value: data.shortUrl,
+                    size: 128,
+                    level: 'H'
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again!');
+            }
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', async function() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    alert('Login successful!');
+                } else {
+                    alert('Login failed!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again!');
+            }
+        });
+
+        document.getElementById('trackBtn').addEventListener('click', async function() {
+            const shortCode = document.getElementById('trackingCodeInput').value;
+
+            try {
+                const response = await fetch(`/api/tracking/${shortCode}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    const errorMessage = await response.text();
+                    alert(`Error: ${errorMessage}`);
+                    return;
+                }
+
+                const data = await response.json();
+                document.getElementById('trackingDataContent').innerHTML = `
+                    Long URL: ${data.longUrl}<br>
+                    Click Count: ${data.clickCount}<br>
+                    Clicks: ${data.clicks.join(', ')}`;
+                
+                // Show the modal
+                document.getElementById('trackingModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again!');
+            }
+        });
+
+        // Close the modal when the user clicks on <span> (x)
+        document.querySelector('.close').onclick = function() {
+            document.getElementById('trackingModal').style.display = 'none';
+        };
+
+        // Close the modal when the user clicks anywhere outside of the modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('trackingModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    </script>
+
+</body>
+</html>
