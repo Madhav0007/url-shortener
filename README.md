@@ -46,16 +46,18 @@ A simple and user-friendly URL shortener application that allows users to shorte
    ```bash
     cd backend
 
-    Create a .env file in the backend directory and set your MongoDB connection string:
+Create a .env file in the backend directory and set your MongoDB connection string:
 
-    Start the backend server
+Start the backend server
    ```bash
     npm start
+```
 
-3.**Setup Frontend:**:
+3.**Setup Frontend:**
     Navigate to the frontend directory:
-    ```bash
+  ```bash
     cd ../frontend
+```
 
-4.**Access the application::**:
+4.**Access the application:**:
     Open your browser and go to http://localhost:3000 to access the URL shortener application.
