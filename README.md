@@ -44,7 +44,7 @@ A simple and user-friendly URL shortener application that allows users to shorte
 2. **Setup Backend:**
     Navigate to the backend directory:
    ```bash
-    cd backend
+    cd server
 
 Create a .env file in the backend directory and set your MongoDB connection string:
 
@@ -56,7 +56,7 @@ Start the backend server
 3.**Setup Frontend:**
     Navigate to the frontend directory:
   ```bash
-    cd ../frontend
+    cd ../client
 ```
 
 4.**Access the application:**:
